@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:refocus_v1/pages/auth/login.dart';
+import 'package:refocus_v1/pages/app_state.dart';
+import 'package:refocus_v1/pages/selectapp.dart';
+import 'package:refocus_v1/widgets/bottomnav.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -8,306 +10,850 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     const primaryColor = Color(0xFF192557);
     const secondaryColor = Color(0xFF1E50A3);
+    const accentColor = Color(0xFF56ADE2);
 
     return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        title: const Text(
-          'ReFocus Dashboard',
-          style: TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.w700,
-            fontFamily: 'Poppins',
-          ),
-        ),
-        centerTitle: true,
-        backgroundColor: primaryColor,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout, color: Colors.white),
-            tooltip: 'Logout',
-            onPressed: () {
-              // Navigate back to Login and clear stack
-              Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (context) => const LoginPage()),
-                (route) => false,
-              );
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Logged out successfully.'),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            },
-          ),
-        ],
-      ),
+      backgroundColor: const Color(0xFFF5F7FA),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Welcome Header
-              const Text(
-                'Welcome Back, Focus Master!',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 24,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Here is your focus summary for today.',
-                style: TextStyle(
-                  color: Color(0xFF6D6D70),
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              const SizedBox(height: 24),
-
-              // Overview Cards Grid
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildSummaryCard(
-                      title: 'Screen Time',
-                      value: '1h 45m',
-                      subtitle: '15m less than yesterday',
-                      icon: Icons.timer_outlined,
-                      color: secondaryColor,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: _buildSummaryCard(
-                      title: 'Focus Score',
-                      value: '92 / 100',
-                      subtitle: 'Excellent focus today!',
-                      icon: Icons.insights_outlined,
-                      color: Colors.green,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Active Challenges Section
-              const Text(
-                'Active Challenges',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 18,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 12),
-              _buildChallengeCard(
-                title: 'No Social Media in Morning',
-                desc: 'Keep off social media apps until 12:00 PM.',
-                progress: 0.8,
-                timeLeft: '3 hours left',
-              ),
-              const SizedBox(height: 12),
-              _buildChallengeCard(
-                title: 'Deep Work Session',
-                desc: 'Complete 3 deep work pomodoro blocks of 25 mins.',
-                progress: 0.66,
-                timeLeft: '1 block remaining',
-              ),
-
-              const SizedBox(height: 32),
-              
-              // Tip of the day card
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFD8EBFA),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: secondaryColor.withAlpha(50)),
-                ),
-                child: const Row(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 440),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Icon(Icons.lightbulb_outline, color: secondaryColor, size: 28),
-                    SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                    // Top App Bar Logo & Notification Bell
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Image.asset(
+                          'assets/images/logo.png',
+                          width: 147,
+                          height: 32,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) {
+                            return const Row(
+                              children: [
+                                Text(
+                                  'Re',
+                                  style: TextStyle(
+                                    color: primaryColor,
+                                    fontSize: 28,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                                SizedBox(width: 2),
+                                Icon(
+                                  Icons.track_changes_rounded,
+                                  color: secondaryColor,
+                                  size: 28,
+                                ),
+                                SizedBox(width: 2),
+                                Text(
+                                  'Focus',
+                                  style: TextStyle(
+                                    color: secondaryColor,
+                                    fontSize: 28,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
+                        ),
+                        IconButton(
+                          icon: const Icon(
+                            Icons.notifications_none_rounded,
+                            color: primaryColor,
+                            size: 28,
+                          ),
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('No new notifications.'),
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
+
+                    // Greeting Row containing Owl Mascot
+                    Row(
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Text(
+                                'Good Morning, Erika! 👋',
+                                style: TextStyle(
+                                  color: Colors.black,
+                                  fontSize: 20,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              const Text(
+                                'Let’s stay focused and achieve your goals today',
+                                style: TextStyle(
+                                  color: Color(0xFF6D6D70),
+                                  fontSize: 12,
+                                  fontFamily: 'Poppins',
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Image.asset(
+                          'assets/images/permission.png',
+                          width: 65,
+                          height: 65,
+                          fit: BoxFit.contain,
+                          errorBuilder: (context, error, stackTrace) => const Icon(
+                            Icons.emoji_nature_rounded,
+                            size: 45,
+                            color: secondaryColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 20),
+
+                    // Focus Score Gradient Card
+                    Container(
+                      width: double.infinity,
+                      decoration: ShapeDecoration(
+                        gradient: const LinearGradient(
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                          colors: [Color(0xFF192557), Color(0xFF263D6C)],
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        shadows: const [
+                          BoxShadow(
+                            color: Color(0x3F000000),
+                            blurRadius: 4,
+                            offset: Offset(5, 5),
+                          )
+                        ],
+                      ),
+                      padding: const EdgeInsets.all(20.0),
+                      child: Row(
                         children: [
-                          Text(
-                            'Focus Tip of the Day',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 14,
-                              fontFamily: 'Poppins',
-                              fontWeight: FontWeight.w700,
+                          // Left Details Column
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Focus Score',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  children: const [
+                                    Text(
+                                      '82',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 64,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w700,
+                                        height: 1.0,
+                                      ),
+                                    ),
+                                    Text(
+                                      ' / 100',
+                                      style: TextStyle(
+                                        color: Colors.white70,
+                                        fontSize: 12,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                // Excellent Badge
+                                Container(
+                                  decoration: ShapeDecoration(
+                                    color: Colors.white.withAlpha(50),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(30),
+                                    ),
+                                  ),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 6,
+                                  ),
+                                  child: Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: const [
+                                      Icon(
+                                        Icons.star_rounded,
+                                        color: Color(0xFFFFD700),
+                                        size: 16,
+                                      ),
+                                      SizedBox(width: 4),
+                                      Text(
+                                        'Excellent!',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                          SizedBox(height: 4),
-                          Text(
-                            'Taking a short 5-minute break every 25 minutes helps maintain high cognitive stamina.',
-                            style: TextStyle(
-                              color: secondaryColor,
-                              fontSize: 12,
-                              fontFamily: 'Poppins',
-                              height: 1.4,
-                            ),
+                          // Right Custom Progress Circle
+                          Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              SizedBox(
+                                width: 110,
+                                height: 110,
+                                child: CircularProgressIndicator(
+                                  value: 0.82,
+                                  strokeWidth: 12,
+                                  backgroundColor: Colors.white24,
+                                  valueColor: const AlwaysStoppedAnimation<Color>(accentColor),
+                                ),
+                              ),
+                              const SizedBox(
+                                width: 85,
+                                child: Text(
+                                  'You’re doing great today!',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 11,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
                     ),
+                    const SizedBox(height: 20),
+
+                    // Symmetrical Overview Row
+                    Row(
+                      children: [
+                        // Left Card: Screen Time
+                        Expanded(
+                          child: Container(
+                            decoration: ShapeDecoration(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1,
+                                  color: Colors.black.withAlpha(20),
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              shadows: const [
+                                BoxShadow(
+                                  color: Color(0x1F000000),
+                                  blurRadius: 4,
+                                  offset: Offset(5, 5),
+                                )
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Today’s Screen Time',
+                                  style: TextStyle(
+                                    color: secondaryColor,
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                const Text(
+                                  '1h 42m',
+                                  style: TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 28,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.arrow_downward_rounded,
+                                      color: Color(0xFF16A34A),
+                                      size: 16,
+                                    ),
+                                    SizedBox(width: 2),
+                                    Text(
+                                      '10%',
+                                      style: TextStyle(
+                                        color: Color(0xFF16A34A),
+                                        fontSize: 12,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Text(
+                                        ' from yesterday',
+                                        overflow: TextOverflow.ellipsis,
+                                        style: TextStyle(
+                                          color: accentColor,
+                                          fontSize: 11,
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Right Card: Streak
+                        Expanded(
+                          child: Container(
+                            decoration: ShapeDecoration(
+                              color: Colors.white,
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1,
+                                  color: Colors.black.withAlpha(20),
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              shadows: const [
+                                BoxShadow(
+                                  color: Color(0x1F000000),
+                                  blurRadius: 4,
+                                  offset: Offset(5, 5),
+                                )
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                const Text(
+                                  'Current Streak',
+                                  style: TextStyle(
+                                    color: secondaryColor,
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Row(
+                                  crossAxisAlignment: CrossAxisAlignment.baseline,
+                                  textBaseline: TextBaseline.alphabetic,
+                                  children: const [
+                                    Text(
+                                      '7',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 28,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      'Days',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 18,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                const Text(
+                                  'Keep your streak alive',
+                                  overflow: TextOverflow.ellipsis,
+                                  style: TextStyle(
+                                    color: accentColor,
+                                    fontSize: 12,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Your Social Media Limits Header
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Your Social Media Limits',
+                          style: TextStyle(
+                            color: Colors.black,
+                            fontSize: 14,
+                            fontFamily: 'Poppins',
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => const SelectAppPage(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            'Edit Limits',
+                            style: TextStyle(
+                              color: secondaryColor,
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Limits List Container
+                    _buildSocialLimitRow(
+                      context: context,
+                      appId: 'instagram',
+                      appName: 'Instagram',
+                      spentLabel: '20m/30m',
+                      ratio: 20 / 30,
+                      percentText: '90%',
+                    ),
+                    _buildSocialLimitRow(
+                      context: context,
+                      appId: 'tiktok',
+                      appName: 'TikTok',
+                      spentLabel: '31m/1h',
+                      ratio: 31 / 60,
+                      percentText: '25%',
+                    ),
+                    _buildSocialLimitRow(
+                      context: context,
+                      appId: 'youtube',
+                      appName: 'YouTube',
+                      spentLabel: '1h/1h 30min',
+                      ratio: 60 / 90,
+                      percentText: '85%',
+                    ),
+                    const SizedBox(height: 24),
+
+                    // Challenges & Insights Section side-by-side
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Left Card: Today's Challenge
+                        Expanded(
+                          child: Container(
+                            decoration: ShapeDecoration(
+                              color: const Color(0xFFD8EBFA),
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1,
+                                  color: Colors.black.withAlpha(20),
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              shadows: const [
+                                BoxShadow(
+                                  color: Color(0x1F000000),
+                                  blurRadius: 4,
+                                  offset: Offset(5, 5),
+                                )
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.sports_esports_rounded,
+                                      color: secondaryColor,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Today’s Challenge',
+                                      style: TextStyle(
+                                        color: secondaryColor,
+                                        fontSize: 11,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                const Text(
+                                  'Memory Match',
+                                  style: TextStyle(
+                                    color: primaryColor,
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                const Text(
+                                  'Train your memory and improve focus in just 2 minutes!',
+                                  style: TextStyle(
+                                    color: secondaryColor,
+                                    fontSize: 11,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    ElevatedButton(
+                                      onPressed: () {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(
+                                            content: Text('Starting challenge...'),
+                                            behavior: SnackBarBehavior.floating,
+                                          ),
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: secondaryColor,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(10),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 10,
+                                          vertical: 6,
+                                        ),
+                                        minimumSize: Size.zero,
+                                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: const [
+                                          Text(
+                                            'Start Challenge',
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontFamily: 'Poppins',
+                                            ),
+                                          ),
+                                          SizedBox(width: 2),
+                                          Icon(
+                                            Icons.chevron_right_rounded,
+                                            color: Colors.white,
+                                            size: 14,
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    Image.asset(
+                                      'assets/images/setdailylimit.png',
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (context, error, stackTrace) => const Icon(
+                                        Icons.pets_rounded,
+                                        size: 24,
+                                        color: secondaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 16),
+                        // Right Card: Daily Insight
+                        Expanded(
+                          child: Container(
+                            decoration: ShapeDecoration(
+                              color: const Color(0xFFD8EBFA),
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1,
+                                  color: Colors.black.withAlpha(20),
+                                ),
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                              shadows: const [
+                                BoxShadow(
+                                  color: Color(0x1F000000),
+                                  blurRadius: 4,
+                                  offset: Offset(5, 5),
+                                )
+                              ],
+                            ),
+                            padding: const EdgeInsets.all(12.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  children: const [
+                                    Icon(
+                                      Icons.lightbulb_outline_rounded,
+                                      color: secondaryColor,
+                                      size: 20,
+                                    ),
+                                    SizedBox(width: 6),
+                                    Text(
+                                      'Daily Insight',
+                                      style: TextStyle(
+                                        color: secondaryColor,
+                                        fontSize: 11,
+                                        fontFamily: 'Poppins',
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                const Text(
+                                  'You spend the most time on social media between',
+                                  style: TextStyle(
+                                    color: secondaryColor,
+                                    fontSize: 11,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                const Text(
+                                  '8 PM - 10 PM',
+                                  style: TextStyle(
+                                    color: primaryColor,
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins',
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                                const SizedBox(height: 6),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  children: [
+                                    const Expanded(
+                                      child: Text(
+                                        'Try to take a break during that time tomorrow!',
+                                        style: TextStyle(
+                                          color: secondaryColor,
+                                          fontSize: 10,
+                                          fontFamily: 'Poppins',
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    Image.asset(
+                                      'assets/images/selectapp.png',
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.contain,
+                                      errorBuilder: (context, error, stackTrace) => const Icon(
+                                        Icons.visibility_outlined,
+                                        size: 24,
+                                        color: secondaryColor,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 16),
                   ],
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
+      bottomNavigationBar: const CustomBottomNavBar(currentIndex: 0),
     );
   }
 
-  Widget _buildSummaryCard({
-    required String title,
-    required String value,
-    required String subtitle,
-    required IconData icon,
-    required Color color,
+  Widget _buildSocialLimitRow({
+    required BuildContext context,
+    required String appId,
+    required String appName,
+    required String spentLabel,
+    required double ratio,
+    required String percentText,
   }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFC3C6D3)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withAlpha(30),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 12),
-          Text(
-            value,
-            style: const TextStyle(
-              color: Color(0xFF1E1E1E),
-              fontSize: 20,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w800,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            style: const TextStyle(
-              color: Color(0xFF1E50A3),
-              fontSize: 13,
-              fontFamily: 'Poppins',
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            subtitle,
-            style: const TextStyle(
-              color: Color(0xFF6D6D70),
-              fontSize: 10,
-              fontFamily: 'Poppins',
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+    const secondaryColor = Color(0xFF1E50A3);
+    const accentColor = Color(0xFF56ADE2);
 
-  Widget _buildChallengeCard({
-    required String title,
-    required String desc,
-    required double progress,
-    required String timeLeft,
-  }) {
-    return Container(
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFC3C6D3)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  color: Color(0xFF1E1E1E),
-                  fontSize: 14,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              Text(
-                timeLeft,
-                style: const TextStyle(
-                  color: Color(0xFF1E50A3),
-                  fontSize: 11,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            desc,
-            style: const TextStyle(
-              color: Color(0xFF6D6D70),
-              fontSize: 12,
-              fontFamily: 'Poppins',
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: Container(
+        width: double.infinity,
+        height: 70,
+        decoration: ShapeDecoration(
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            side: const BorderSide(
+              width: 1,
+              color: Color(0xFFCEE9FF),
             ),
+            borderRadius: BorderRadius.circular(15),
           ),
-          const SizedBox(height: 12),
-          Row(
-            children: [
-              Expanded(
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(10),
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: const Color(0x1F1E50A3),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(0xFF1E50A3)),
-                    minHeight: 8,
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 14.0),
+        child: Row(
+          children: [
+            // Branded icon from state class
+            BrandedAppIcon(appId: appId, size: 42),
+            const SizedBox(width: 12),
+            // Progress Bar and Labels
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        appName,
+                        style: const TextStyle(
+                          color: secondaryColor,
+                          fontSize: 14,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      Text(
+                        spentLabel,
+                        style: const TextStyle(
+                          color: secondaryColor,
+                          fontSize: 13,
+                          fontFamily: 'Poppins',
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 6),
+                  // Progress Track and Custom Gradient Fill
+                  Stack(
+                    children: [
+                      // Full track
+                      Container(
+                        width: double.infinity,
+                        height: 7,
+                        decoration: ShapeDecoration(
+                          color: const Color(0xFFE6E6E6),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                      // Fraction fill with gradient
+                      FractionallySizedBox(
+                        widthFactor: ratio.clamp(0.0, 1.0),
+                        child: Container(
+                          height: 7,
+                          decoration: ShapeDecoration(
+                            gradient: const LinearGradient(
+                              begin: Alignment.centerLeft,
+                              end: Alignment.centerRight,
+                              colors: [Color(0xFFC8DCFF), accentColor],
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 12),
+            // Percentage Spent Badge
+            Container(
+              width: 51,
+              height: 21,
+              decoration: ShapeDecoration(
+                color: const Color(0xFFD8EBFA),
+                shape: RoundedRectangleBorder(
+                  side: const BorderSide(
+                    width: 1,
+                    color: accentColor,
+                  ),
+                  borderRadius: BorderRadius.circular(5),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  percentText,
+                  style: const TextStyle(
+                    color: secondaryColor,
+                    fontSize: 11,
+                    fontFamily: 'Poppins',
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ),
-              const SizedBox(width: 12),
-              Text(
-                '${(progress * 100).toInt()}%',
-                style: const TextStyle(
-                  color: Color(0xFF192557),
-                  fontSize: 12,
-                  fontFamily: 'Poppins',
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }

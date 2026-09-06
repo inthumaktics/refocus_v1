@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:refocus_v1/pages/auth/auth_state.dart';
 import 'package:refocus_v1/pages/auth/signup.dart';
-import 'package:refocus_v1/pages/home.dart';
+import 'package:refocus_v1/pages/permission.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -39,10 +39,10 @@ class _LoginPageState extends State<LoginPage> {
           ),
         );
 
-        // Navigate to Home page and clear navigation stack
+        // Navigate to Permission page and clear navigation stack
         Navigator.pushAndRemoveUntil(
           context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
+          MaterialPageRoute(builder: (context) => const PermissionPage()),
           (route) => false,
         );
       } else {

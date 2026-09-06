@@ -239,13 +239,17 @@ class _PageIndicator extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 22.11,
-      height: 70,
+      width: 16,
+      height: 16,
       decoration: BoxDecoration(
         color: isActive
             ? _Intro3Styles.primaryColor
-            : _Intro3Styles.primaryColor.withAlpha(76),
-        borderRadius: BorderRadius.circular(11),
+            : Colors.transparent,
+        border: Border.all(
+          color: _Intro3Styles.primaryColor,
+          width: 2,
+        ),
+        shape: BoxShape.circle,
       ),
     );
   }
